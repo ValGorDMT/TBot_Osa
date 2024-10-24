@@ -1,6 +1,6 @@
 from aiogram import F, Router
 from aiogram.filters import CommandStart, Command
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
 import app.keyboards as kb
 #from app.keyboards import main это импорт конкретной переменой, а выше импорт всех переменных и сокращение ее пути до 2х символов
 
@@ -14,14 +14,21 @@ router = Router()
 
 @router.message(CommandStart())
 async def cmd_start(message: Message):
-    await message.reply_photo(photo='AgACAgIAAxkBAAIBvWcS97hpbwubFRxWzic-NGTaUgq6AAIq5TEbe9uYSNBxOTRg7iupAQADAgADeQADNgQ', #Этот айдишник получил с помощью команды ниже
+    await message.answer_photo(photo='AgACAgIAAxkBAAIBvWcS97hpbwubFRxWzic-NGTaUgq6AAIq5TEbe9uYSNBxOTRg7iupAQADAgADeQADNgQ', #Этот айдишник получил с помощью команды ниже
                               caption=f'Привет {message.from_user.first_name}! Твой ID: {message.from_user.id}',
                               reply_markup=kb.startkb)
     
 @router.callback_query(F.data == 'startkb')
 async def cmd_menu(callback: CallbackQuery):
-    await callback.message.edit_caption(caption='И так', 
+    await callback.message.delete()
+    await callback.answer()
+    await callback.message.answer_photo(photo='AgACAgIAAxkBAAICj2cTzKzLm9nG8VZpAAEP6-7dKzVt8QAC798xG3vboEj9-yeNNvUhQgEAAwIAA3kAAzYE',
+                                        caption='И так', 
                                         reply_markup=kb.main)
+
+@router.message(Command('clear'))
+async def clear(message: Message):
+    await message.answer('удалено', reply_markup=ReplyKeyboardRemove(),)
 
 @router.message(F.photo)
 async def id_foto(message: Message):
